@@ -1,2 +1,0 @@
-State, Start,Name,RoundStart,LoadGun,PreTurnDecisions,PlayerTurn,PickItem,DealerTurn,DealerDecide,ShootGun,RoundEnd,GameOver
-Description, Start of game, Entering Name , Start of Round. Set Health. Empty Inventories , Load gun , Any events that need to be processed before next turn. then deciding whose turn it is , Player chooses between using item or shooting gun , Pick Item , Start of Dealer's Turn , Dealer Decision Algorithm , Use the gun to shoot. discard bullet , End of Round , Show Stats. End program

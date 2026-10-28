@@ -36,10 +36,14 @@ namespace TextShot
 
         // Gun
         public static Gun gun = null;
+        public static bool GunFrom  = false; // Who its coming from, True = Player
+        public static bool GunTo    = false; // Who its shooting,    True = Player
 
         // Participants
         public static Player p;
         public static Dealer d;
+
+        public static string input;
 
 
         // =====================
@@ -297,14 +301,34 @@ namespace TextShot
                         Console.WriteLine("h: look at health");
 
                         // Get input
-                        string input = Console.ReadLine().Trim().ToLower();
+                        input = Console.ReadLine().Trim().ToLower();
                         if (Debug) { Console.WriteLine($"Debug Player Input: {input}\n"); }
 
                         // Process input
                         if (input == "g")
                         {
-                            CurrentState = State.ShootGun;
-                            break;
+                            GunFrom = true;
+                            Console.WriteLine("Who do you shoot?\nP = Player (You)\nD = Dealer\nC = Cancel\n");
+                            input = Console.ReadLine().Trim().ToLower();
+                            if (input == "p")
+                            {
+                                GunTo = false;
+                                CurrentState = State.ShootGun;
+                                if (Debug) { Console.WriteLine("Debug Player shoots Player\n"); }
+                            }
+                            else if (input == "d")
+                            {
+                                GunTo = true;
+                                CurrentState = State.ShootGun;
+                                if (Debug) { Console.WriteLine("Debug Player shoots Dealer\n"); }
+                            }
+                            else
+                            {
+                                // Invalid input
+                                Console.WriteLine("Invalid input");
+                                if (Debug) { Console.WriteLine("Debug Invalid input"); }
+                                continue;
+                            }
                         }
                         else if (input == "ui")
                         {
@@ -378,7 +402,7 @@ namespace TextShot
                     // Get input
                     string input = Console.ReadLine().Trim().ToLower();
                     
-                    if (input == "c")
+                    if (input == "c") // Cancel (go back to player turn)
                     {
                         CurrentState = State.PlayerTurn;
                     }
@@ -416,6 +440,7 @@ namespace TextShot
                 // Shoot Gun
                 else if (CurrentState == State.ShootGun)
                 {
+                    // 
                     break; // work in progress
                 }
 
