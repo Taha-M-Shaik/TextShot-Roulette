@@ -10,6 +10,13 @@ namespace TextShot
         override public void ExecuteEffect()
         {
             base.ExecuteEffect();
+
+            // Read current bullet
+            Console.Write("Bullet ejected: ");
+            Program.Gun.PrintCurBullet();
+
+            // Eject curent bullet
+            Program.Gun.EjectCurBullet();
         }
     }
 }

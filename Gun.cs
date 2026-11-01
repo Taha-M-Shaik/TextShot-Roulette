@@ -65,13 +65,13 @@ namespace TextShot
         {
             // Print amount of live bullets
             if (_liveBullets == 1)
-            { Console.WriteLine($"{_liveBullets} live bullet"); }
+            { Console.Write($"1 live bullet, "); }
             else
-            { Console.WriteLine($"{_liveBullets} live bullets"); }
+            { Console.Write($"{_liveBullets} live bullets, "); }
 
             // Print amount of dud bullets
             if (_dudBullets == 1)
-            { Console.WriteLine($"{_dudBullets} dud bullet"); }
+            { Console.WriteLine($"1 dud bullet"); }
             else
             { Console.WriteLine($"{_dudBullets} dud bullets"); }
         }
@@ -82,21 +82,21 @@ namespace TextShot
             {
                 return _bullets[0];
             }
-            return false; // Required return path if the gun is empty
+            else
+            {
+                return false; // Required return path if the gun is empty
+            }
         }
 
         public void PrintCurBullet() // Print current bullet
         {
-            if (_bullets.Count > 0)
+            if (ReadCurBullent())
             {
-                if (_bullets[0])
-                {
-                    Console.WriteLine("Live");
-                }
-                else
-                {
-                    Console.WriteLine("Dud");
-                }
+                Console.WriteLine("Live");
+            }
+            else
+            {
+                Console.WriteLine("Dud");
             }
         }
 
@@ -120,7 +120,7 @@ namespace TextShot
                     _dudBullets--;
                 }
 
-                if (Program.Debug) { Console.WriteLine($"Debug Bullet Ejected. Remaining: {_bullets.Count}"); }
+                if (Program.Debug) { Console.WriteLine($"Debug Bullet Ejected. Remaining: {_bullets.Count}"); Console.Write("Debug "); PrintLoadout(); }
             }
         }
     }

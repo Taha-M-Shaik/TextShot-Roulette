@@ -48,7 +48,7 @@ namespace TextShot
 
         // =====================
         // Debug
-        public static bool Debug = false;
+        public static bool Debug = true;
 
 
 
