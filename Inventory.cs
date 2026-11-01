@@ -75,7 +75,7 @@ namespace TextShot
         {
             for (int i = 0; i < amount; i++)
             {
-                int randomChoice = r.Next(6);
+                int randomChoice = r.Next(7);
                 Item newItem = null;
 
                 switch (randomChoice)
@@ -97,6 +97,9 @@ namespace TextShot
                         break;
                     case 5:
                         newItem = new MagnifyingGlass();
+                        break;
+                    case 6:
+                        newItem = new SyringeShot();
                         break;
                 }
 

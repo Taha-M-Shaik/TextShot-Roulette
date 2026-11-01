@@ -377,7 +377,8 @@ namespace TextShot
                         { "Hand Cuffs",             "HC" },
                         { "Bugged Circuit Board",    "BC" },
                         { "Infected bullet",        "IB" },
-                        { "Magnifying Glass",       "MG" }
+                        { "Magnifying Glass",       "MG" },
+                        { "Syringe Shot",           "SS" }
                     };
 
                     p.PrintInventory();
