@@ -35,7 +35,7 @@ namespace TextShot
         public static bool PlayerTurn = true; // Keeps track of whose turn it is, always start with player
 
         // Gun
-        public static Gun gun = null;
+        public static Gun Gun = null;
         public static bool GunFrom  = false; // Who its coming from, True = Player
         public static bool GunTo    = false; // Who its shooting,    True = Player
 
@@ -48,7 +48,7 @@ namespace TextShot
 
         // =====================
         // Debug
-        public static bool Debug = true;
+        public static bool Debug = false;
 
 
 
@@ -161,7 +161,7 @@ namespace TextShot
                 // Explain Game
                 else if (CurrentState == State.ExplainGame)
                 {
-                    Console.WriteLine("You and I take turns using a gun.\nThe gun has a random assortment of live bullets and dud bullets.\n(Press Enter to continue)");
+                    Console.WriteLine("You and I take turns using a Gun.\nThe gun has a random assortment of live bullets and dud bullets.\n(Press Enter to continue)");
                     Console.ReadLine();
                     Console.WriteLine("Each turn, you can use any items if we have any.\nItems can help your chances of survival, or decrease mine.\n(Press Enter to continue)");
                     Console.ReadLine();
@@ -204,7 +204,7 @@ namespace TextShot
                     // Create Participants
                     p = new Player(PlayerName, Health);
                     d = new Dealer("Dealer", Health);
-                    Console.WriteLine($"You and I have {Health} health");
+                    Console.WriteLine($"\nYou and I have {Health} health");
                     if (Debug) { Console.WriteLine($"Debug Player {Health} health, Dealer {Health} health"); }
 
                     // Empty Inventories
@@ -213,7 +213,7 @@ namespace TextShot
 
                     // Populate Inventories
                     int InveAmount = r.Next(2, 5);
-                    p.Inventory.PopulateInventory(InveAmount);
+                    p.Inventory.PopulateInventory(20);
                     d.Inventory.PopulateInventory(InveAmount);
 
                     // Transition to LoadGun
@@ -228,14 +228,14 @@ namespace TextShot
                 {
                     // Load the gun
                     int numOfBullets = r.Next(2, 8);
-                    gun = new Gun(numOfBullets);
-                    gun.Load(numOfBullets);
+                    Gun = new Gun(numOfBullets);
+                    Gun.Load(numOfBullets);
 
                     // Shuffle the array to randomize bullet order (Fisher-Yates shuffle)
-                    gun.Shuffle();
+                    Gun.Shuffle();
 
                     // Print amount of live bullets
-                    gun.PrintLoadout();
+                    Gun.PrintLoadout();
 
                     // Flavour text
                     Console.ReadLine();
@@ -252,8 +252,8 @@ namespace TextShot
                 else if (CurrentState == State.PreTurnDecisions)
                 {
                     // See whose turn it is right now
-                    Console.Write("It's the ");
-                    if (PlayerTurn) { Console.WriteLine("Player's turn"); } else { Console.WriteLine("Dealer's turn"); }
+                    Console.Write("It's ");
+                    if (PlayerTurn) { Console.WriteLine("your turn"); } else { Console.WriteLine("the Dealer's turn"); }
 
                     // If the key value of "Hand Cuffs" is the dictionary is true
                     if (Debug) { Console.WriteLine($"Debug Handcuffs value: {PreTurnDecisions["Handcuffs"]}"); }
@@ -286,7 +286,6 @@ namespace TextShot
                 else if (CurrentState == State.PlayerTurn)
                 {
                     PlayerTurn = true;
-                    Console.WriteLine("It's your turn");
                     
                     // Mini State machine in the player's turn
                     while (true)
@@ -303,24 +302,34 @@ namespace TextShot
                         // Get input
                         input = Console.ReadLine().Trim().ToLower();
                         if (Debug) { Console.WriteLine($"Debug Player Input: {input}\n"); }
+                        Console.WriteLine(); // Buffer
 
                         // Process input
                         if (input == "g")
                         {
+                            if (Debug) { Console.WriteLine("Debug Inside Gun loop"); }
                             GunFrom = true;
                             Console.WriteLine("Who do you shoot?\nP = Player (You)\nD = Dealer\nC = Cancel\n");
                             input = Console.ReadLine().Trim().ToLower();
+                            Console.WriteLine(); // Buffer
                             if (input == "p")
                             {
-                                GunTo = false;
+                                Console.WriteLine("\nYou shoot yourself");
+                                GunTo = true;
                                 CurrentState = State.ShootGun;
-                                if (Debug) { Console.WriteLine("Debug Player shoots Player\n"); }
+                                break;
                             }
                             else if (input == "d")
                             {
-                                GunTo = true;
+                                Console.WriteLine("\nYou shoot the Dealer");
+                                GunTo = false;
                                 CurrentState = State.ShootGun;
-                                if (Debug) { Console.WriteLine("Debug Player shoots Dealer\n"); }
+                                break;
+                            }
+                            else if (input == "c")
+                            {
+                                if (Debug) { Console.WriteLine("Debug Cancel Gun loop"); }
+                                break;
                             }
                             else
                             {
@@ -337,12 +346,12 @@ namespace TextShot
                         }
                         else if (input == "di")
                         {
-                            Console.WriteLine("Dealers items:");
+                            Console.WriteLine("Dealer's items:");
                             d.PrintInventory();
                         }
                         else if (input == "h")
                         {
-                            Console.WriteLine($"You have {p.Health} health and the dealer has {d.Health} health");
+                            Console.WriteLine($"You have {p.Health} health and the dealer has {d.Health} health\n");
                         } 
                     }
                 }
@@ -363,15 +372,15 @@ namespace TextShot
                     // Map full names to your desired acronyms
                     Dictionary<string, string> itemAcronyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                     {
-                        { "Bugged Circuitboard",    "BC" },
                         { "Can of Beer",            "CB" },
                         { "Expired Medicine",       "EM" },
                         { "Hand Cuffs",             "HC" },
+                        { "Bugged Circuit Board",    "BC" },
                         { "Infected bullet",        "IB" },
                         { "Magnifying Glass",       "MG" }
                     };
 
-                    Console.WriteLine("Your items:");
+                    p.PrintInventory();
                     
                     // Temporary dictionary to track which acronyms the player can actually use right now
                     Dictionary<string, string> availableOptions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -382,11 +391,12 @@ namespace TextShot
                         if (itemAcronyms.ContainsKey(item.Name))
                         {
                             string acronym = itemAcronyms[item.Name];
+                            if (Debug) { Console.WriteLine($"Debug Item: {item.Name}, Acronym: {acronym}"); }
                             
                             // Prevent printing the same option twice if they have duplicates
                             if (!availableOptions.ContainsKey(acronym))
                             {
-                                Console.WriteLine($"{acronym} - {item.Name}");
+                                Console.WriteLine($"Type {acronym} to use {item.Name}");
                                 availableOptions.Add(acronym, item.Name);
                             }
                         }
@@ -401,6 +411,7 @@ namespace TextShot
                     
                     // Get input
                     string input = Console.ReadLine().Trim().ToLower();
+                    Console.WriteLine(); // Buffer
                     
                     if (input == "c") // Cancel (go back to player turn)
                     {
@@ -416,7 +427,7 @@ namespace TextShot
 
                         if (selectedItem != null)
                         {
-                            Console.WriteLine($"\nYou used the {selectedItem.Name}!");
+                            Console.WriteLine($"\nYou used the {selectedItem.Name}!\n");
                             selectedItem.ExecuteEffect();
                             CurrentState = State.PlayerTurn; 
                         }
@@ -440,8 +451,36 @@ namespace TextShot
                 // Shoot Gun
                 else if (CurrentState == State.ShootGun)
                 {
-                    // 
-                    break; // work in progress
+                    // Who shoots who
+                    if (Debug)
+                    {
+                        Console.Write("Debug ");
+                        if (GunFrom) { Console.Write("Player"); } else { Console.Write("Dealer"); }
+                        Console.Write(" shoots ");
+                        if (GunTo) { Console.WriteLine("Player"); } else { Console.WriteLine("Dealer"); }
+                    }
+
+                    // Read Bullet
+                    bool isLive = Gun.ReadCurBullent();
+
+                    // Print Bullet
+                    if (Debug) { Console.WriteLine($"Debug Current Bullet: {isLive}"); }
+
+                    // Remove Health
+                    if (isLive)
+                    {
+                        if (GunFrom) { p.Health--; } else { d.Health--; }
+                    }
+
+                    // Eject Bullet
+                    Gun.EjectCurBullet();
+
+                    // Print new Bullet and Bullets left
+                    if (Debug) { Console.WriteLine($"Debug New Bullet: {isLive}"); }
+
+                    // Return to Pre-Turn Decisions
+                    PlayerTurn = !PlayerTurn; // Flip turn
+                    CurrentState = State.PreTurnDecisions;
                 }
 
 

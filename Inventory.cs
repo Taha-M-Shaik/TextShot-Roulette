@@ -51,7 +51,7 @@ namespace TextShot
         // Reads and prints all items currently in the inventory
         public void ReadItems()
         {
-            Console.WriteLine("--- Inventory ---");
+            Console.WriteLine("---- Inventory ----");
             if (_items.Count == 0)
             {
                 Console.WriteLine("Your inventory is currently empty");
@@ -62,7 +62,7 @@ namespace TextShot
             {
                 Console.WriteLine($"- {item.Name}: {item.Description}");
             }
-            Console.WriteLine("-----------------");
+            Console.WriteLine("-------------------\n");
         }
 
         public void ClearOutInventory()
@@ -75,7 +75,7 @@ namespace TextShot
         {
             for (int i = 0; i < amount; i++)
             {
-                int randomChoice = r.Next(5);
+                int randomChoice = r.Next(6);
                 Item newItem = null;
 
                 switch (randomChoice)

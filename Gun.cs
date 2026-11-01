@@ -15,9 +15,24 @@ namespace TextShot
             _bullets = new List<bool>();
         }
 
+        public int LiveBullets
+        {
+            get { return _liveBullets; }
+        }
+
+        public int DudBullets
+        {
+            get { return _dudBullets; }
+        }
+
+        public List<bool> Bullets
+        {
+            get { return _bullets; }
+        }
+
         public void Load(int n)
         {
-            // Initialize fresh list
+            // Use backing fields (_bullets) instead of read-only properties (Bullets)
             _bullets = new List<bool>();
             if (Program.Debug) { Console.WriteLine($"Debug Loaded {n} bullets"); }
 
@@ -34,7 +49,7 @@ namespace TextShot
 
         public void Shuffle()
         {
-            // Shuffle the list to randomize bullet order (Fisher-Yates shuffle)
+            // Shuffle the list to randomize bullet order
             for (int i = 0; i < _bullets.Count; i++)
             {
                 int randomIndex = r.Next(i, _bullets.Count);
@@ -61,15 +76,27 @@ namespace TextShot
             { Console.WriteLine($"{_dudBullets} dud bullets"); }
         }
 
-        public void ReadCurBullent() // Read current bullet
+        public bool ReadCurBullent() // Read current bullet
         {
             if (_bullets.Count > 0)
             {
-                Console.WriteLine($"The current bullet is a {(_bullets[0] ? "live" : "dud")} bullet");
+                return _bullets[0];
             }
-            else
+            return false; // Required return path if the gun is empty
+        }
+
+        public void PrintCurBullet() // Print current bullet
+        {
+            if (_bullets.Count > 0)
             {
-                Console.WriteLine("The gun is empty.");
+                if (_bullets[0])
+                {
+                    Console.WriteLine("Live");
+                }
+                else
+                {
+                    Console.WriteLine("Dud");
+                }
             }
         }
 
