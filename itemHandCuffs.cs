@@ -10,6 +10,9 @@ namespace TextShot
         override public void ExecuteEffect()
         {
             base.ExecuteEffect();
+
+            // Set handcuffs to true
+            Program.HandCuffed = true;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace TextShot
         public static State PrevState = State.Start;
 
         // Pre Turn Decisions
-        public static Dictionary<string, bool> PreTurnDecisions = new Dictionary<string, bool>(); // Decisions defined in main
+        public static bool HandCuffed = false; // Keeps track if handcuffs is used
         public static bool PlayerTurn = true; // Keeps track of whose turn it is, true = Player's turn
 
         // Gun
@@ -51,7 +51,7 @@ namespace TextShot
 
         // =====================
         // Debug
-        public static bool Debug = true;
+        public static bool Debug = false;
 
 
 
@@ -66,10 +66,6 @@ namespace TextShot
 
             // New Random
             Random r = new Random();
-
-
-            // PreTurnDecisions
-            PreTurnDecisions.Add("Handcuffs", false);
 
 
             // =====================
@@ -251,22 +247,15 @@ namespace TextShot
                 // Pre Turn Decisions
                 else if (CurrentState == State.PreTurnDecisions)
                 {
-                    // See whose turn it is right now
-                    Console.Write("It's ");
-                    if (PlayerTurn) { Console.WriteLine("your turn"); } else { Console.WriteLine("the Dealer's turn"); }
-
-                    // If the key value of "Hand Cuffs" is the dictionary is true
-                    if (Debug) { Console.WriteLine($"Debug Handcuffs value: {PreTurnDecisions["Handcuffs"]}"); }
-                    if (PreTurnDecisions.ContainsKey("Handcuffs") && PreTurnDecisions["Handcuffs"] == true)
+                    // Determine whose turn it is
+                    if (Debug) { Console.WriteLine($"Debug Handcuffs value: {HandCuffed}"); }
+                    if (HandCuffed)
                     {
-                        // Print who is hand cuffed
-                        if (PlayerTurn) { Console.WriteLine("Player is hand cuffed"); } else { Console.WriteLine("Dealer is hand cuffed"); }
-                        Console.WriteLine("The turn is skipped");
-                        // Change Turn
+                        // Skip the next player's turn
                         PlayerTurn = !PlayerTurn;
-                        // Toggle Handcuffs
-                        PreTurnDecisions["Handcuffs"] = false;
-                        if (Debug) { Console.WriteLine("Debug Handcuffs toggled"); }
+                        if (Debug) { Console.WriteLine($"Debug Handcuffed used up, skipping turn"); }
+                        Console.WriteLine("Handcuffs used up, skipping turn");
+                        HandCuffed = false;
                     }
 
                     // Determine whose turn it is
@@ -285,6 +274,8 @@ namespace TextShot
                 // Player Turn
                 else if (CurrentState == State.PlayerTurn)
                 {
+                    // Establish your turn
+                    Console.WriteLine("\nIt's your turn");
                     PlayerTurn = true;
                     
                     // Mini State machine in the player's turn
@@ -361,8 +352,10 @@ namespace TextShot
                 // Dealer Turn
                 else if (CurrentState == State.DealerTurn)
                 {
-                    // Use SyringeShot (test)
+                    // Establish your turn
+                    Console.WriteLine("\nIt's your turn");
 
+                    // Use SyringeShot (test)
                     try
                     {
                         Item s = d.Inventory.FetchItem("Syringe Shot");
@@ -385,7 +378,7 @@ namespace TextShot
                         { "Can of Beer",            "CB" },
                         { "Expired Medicine",       "EM" },
                         { "Hand Cuffs",             "HC" },
-                        { "Bugged Circuit Board",    "BC" },
+                        { "Bugged Circuit Board",   "BC" },
                         { "Infected bullet",        "IB" },
                         { "Magnifying Glass",       "MG" },
                         { "Syringe Shot",           "SS" }
