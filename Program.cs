@@ -32,7 +32,7 @@ namespace TextShot
 
         // Pre Turn Decisions
         public static Dictionary<string, bool> PreTurnDecisions = new Dictionary<string, bool>(); // Decisions defined in main
-        public static bool PlayerTurn = true; // Keeps track of whose turn it is, always start with player
+        public static bool PlayerTurn = true; // Keeps track of whose turn it is, true = Player's turn
 
         // Gun
         public static Gun Gun = null;
@@ -44,6 +44,9 @@ namespace TextShot
         public static Dealer d;
 
         public static string input;
+
+        // Player & Dealer Health
+        public static int MaxHealth;
 
 
         // =====================
@@ -77,9 +80,6 @@ namespace TextShot
 
             // Player Name
             string PlayerName = "";
-
-            // Player & Dealer Health
-            int Health;
 
 
 
@@ -198,14 +198,14 @@ namespace TextShot
                     // New Random
                     r = new Random();
 
-                    // Set Health
-                    Health = r.Next(3,5);
+                    // Set MaxHealth
+                    MaxHealth = r.Next(3,5);
 
                     // Create Participants
-                    p = new Player(PlayerName, Health);
-                    d = new Dealer("Dealer", Health);
-                    Console.WriteLine($"\nYou and I have {Health} health");
-                    if (Debug) { Console.WriteLine($"Debug Player {Health} health, Dealer {Health} health"); }
+                    p = new Player(PlayerName, MaxHealth);
+                    d = new Dealer("Dealer", MaxHealth);
+                    Console.WriteLine($"\nYou and I have {MaxHealth} health");
+                    if (Debug) { Console.WriteLine($"Debug Player {MaxHealth} health, Dealer {MaxHealth} health"); }
 
                     // Empty Inventories
                     p.ClearInventory();
@@ -213,7 +213,7 @@ namespace TextShot
 
                     // Populate Inventories
                     int InveAmount = r.Next(2, 5);
-                    p.Inventory.PopulateInventory(20);
+                    p.Inventory.PopulateInventory(InveAmount);
                     d.Inventory.PopulateInventory(InveAmount);
 
                     // Transition to LoadGun
@@ -361,6 +361,16 @@ namespace TextShot
                 // Dealer Turn
                 else if (CurrentState == State.DealerTurn)
                 {
+                    // Use SyringeShot (test)
+
+                    try
+                    {
+                        Item s = d.Inventory.FetchItem("Syringe Shot");
+                        s.ExecuteEffect();
+                        if (Debug) { Console.WriteLine("Debug DEALER USED SYRINGE!!!"); }
+                    }
+                    finally { /*nothing lol*/ }
+
                     break; // work in progress
                 }
 
@@ -430,7 +440,7 @@ namespace TextShot
                         {
                             Console.WriteLine($"\nYou used the {selectedItem.Name}!\n");
                             selectedItem.ExecuteEffect();
-                            CurrentState = State.PlayerTurn; 
+                            CurrentState = State.PlayerTurn;
                         }
                     }
                     else
