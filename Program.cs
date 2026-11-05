@@ -6,9 +6,10 @@ namespace TextShot
     class Program
     {
         // ================================
-        // State Machine, Pre Turn Decisions & Turn storage
+        // Game Variables -- Important Game handling things
         // ================================
 
+        // =====================
         // Game States
         public enum State
         {
@@ -30,22 +31,32 @@ namespace TextShot
         public static State CurrentState = State.Start;
         public static State PrevState = State.Start;
 
-        // Pre Turn Decisions
-        public static bool HandCuffed = false; // Keeps track if handcuffs is used
-        public static bool PlayerTurn = true; // Keeps track of whose turn it is, true = Player's turn
 
+        // =====================
+        // Pre Turn Decisions && Item info
+        public static bool HandCuffed = false; // Keeps track if handcuffs is used
+        public static bool InfectedBullet = false; // Keeps track if bullet is infected
+        public static bool PlayerTurn = true; // Keeps track of whose turn it is, true = Player's turn
+        // New Random
+        public static Random r = new Random();
+
+        // =====================
         // Gun
         public static Gun Gun = null;
         public static bool GunFrom  = false; // Who its coming from, True = Player
-        public static bool GunTo    = false; // Who its shooting,    True = Player
+        public static bool GunTo = false;    // Who its shooting, True = Player
 
+
+        // =====================
         // Participants
         public static Player p;
         public static Dealer d;
 
+        // Player Name
+        public static string PlayerName = "";
+
         public static string input;
 
-        // Player & Dealer Health
         public static int MaxHealth;
 
 
@@ -57,28 +68,6 @@ namespace TextShot
 
         public static void Main(string[] args)
         {
-            // ================================
-            // Initialise Variables
-            // ================================
-
-            // =====================
-            // Game Variables
-
-            // New Random
-            Random r = new Random();
-
-
-            // =====================
-            // Player & Dealer Variables
-
-            // Player Command
-            string Command = "";
-
-            // Player Name
-            string PlayerName = "";
-
-
-
             // ================================
             // Game Loop
             // ================================
@@ -107,7 +96,7 @@ namespace TextShot
                 // State Machine
                 // ================================
 
-                // ================================
+                // =====================
                 // Start
                 if (CurrentState == State.Start)
                 {
@@ -119,7 +108,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Name
                 else if (CurrentState == State.Name)
                 {
@@ -152,7 +141,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Explain Game
                 else if (CurrentState == State.ExplainGame)
                 {
@@ -186,7 +175,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Round Start
                 else if (CurrentState == State.RoundStart)
                 {
@@ -217,7 +206,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Load Gun
                 else if (CurrentState == State.LoadGun)
                 {
@@ -242,7 +231,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Pre Turn Decisions
                 else if (CurrentState == State.PreTurnDecisions)
                 {
@@ -281,7 +270,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Player Turn
                 else if (CurrentState == State.PlayerSTurn)
                 {
@@ -359,7 +348,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Dealer Turn
                 else if (CurrentState == State.DealerSTurn)
                 {
@@ -377,7 +366,7 @@ namespace TextShot
                 }
 
 
-                // ===============================
+                // =====================
                 // Player pick items
                 else if (CurrentState == State.PickItem)
                 {
@@ -452,7 +441,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Dealer Decisions
                 else if (CurrentState == State.DealerDecide)
                 {
@@ -460,7 +449,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Shoot Gun
                 else if (CurrentState == State.ShootGun)
                 {
@@ -497,7 +486,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // End Round
                 else if (CurrentState == State.RoundEnd)
                 {
@@ -505,7 +494,7 @@ namespace TextShot
                 }
 
 
-                // ================================
+                // =====================
                 // Game over
                 else if (CurrentState == State.GameOver)
                 {
