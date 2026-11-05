@@ -35,10 +35,10 @@ namespace TextShot
         // =====================
         // Pre Turn Decisions && Item info
         public static bool HandCuffed = false; // Keeps track if handcuffs is used
-        public static bool InfectedBullet = false; // Keeps track if bullet is infected
+        public static bool InfectedIsBullet = false; // Keeps track if bullet is infected
         public static bool PlayerTurn = true; // Keeps track of whose turn it is, true = Player's turn
         // New Random
-        public static Random r = new Random();
+        public static Random r;
 
         // =====================
         // Gun
@@ -183,7 +183,7 @@ namespace TextShot
                     r = new Random();
 
                     // Set MaxHealth
-                    MaxHealth = r.Next(3,5);
+                    MaxHealth = r.Next(2, 5);
 
                     // Create Participants
                     p = new Player(PlayerName, MaxHealth);
@@ -197,7 +197,7 @@ namespace TextShot
 
                     // Populate Inventories
                     int InveAmount = r.Next(2, 5);
-                    p.Inventory.PopulateInventory(InveAmount);
+                    p.Inventory.PopulateInventory(13);
                     d.Inventory.PopulateInventory(InveAmount);
 
                     // Transition to LoadGun
@@ -235,6 +235,10 @@ namespace TextShot
                 // Pre Turn Decisions
                 else if (CurrentState == State.PreTurnDecisions)
                 {
+                    // New Random
+                    r = new Random();
+                    if (Debug) { Console.WriteLine("Debug New Random"); }
+
                     // Determine whose turn it is
                     if (Debug) { Console.WriteLine($"Debug Handcuffs value: {HandCuffed}"); }
                     if (HandCuffed)
@@ -246,8 +250,19 @@ namespace TextShot
                         HandCuffed = false;
                     }
 
+                    // =====================
+                    // Determine whose turn it is
+                    if (PlayerTurn)
+                    {
+                        CurrentState = State.PlayerSTurn;
+                    }
+                    else
+                    {
+                        CurrentState = State.DealerSTurn;
+                    }
 
-                    // Check if gun is empty
+                    // =====================
+                    // Check if gun is empty (overrides turn decisions)
                     if (Gun.Bullets.Count == 0)
                     {
                         // Transition to LoadGun
@@ -255,17 +270,14 @@ namespace TextShot
                         CurrentState = State.LoadGun;
                         if (Debug) { Console.WriteLine("Debug Gun empty, transition to LoadGun"); }
                     }
-                    else // Bullets remain
+
+                    // =====================
+                    // End round if either participant is dead
+                    if (p.Health == 0 || d.Health == 0)
                     {
-                        // Determine whose turn it is
-                        if (PlayerTurn)
-                        {
-                            CurrentState = State.PlayerSTurn;
-                        }
-                        else
-                        {
-                            CurrentState = State.DealerSTurn;
-                        }
+                        // Transition to RoundEnd
+                        CurrentState = State.RoundEnd;
+                        if (Debug) { Console.WriteLine($"Debug Player {p.Health} health, Dealer {d.Health} health"); }
                     }
                 }
 
@@ -285,10 +297,10 @@ namespace TextShot
 
                         // Show avilable Commands
                         Console.WriteLine("Options:\n");
-                        Console.WriteLine("g: use gun");
-                        Console.WriteLine("ui: use your items");
-                        Console.WriteLine("di: view dealer's items");
-                        Console.WriteLine("h: look at health");
+                        Console.WriteLine("g:   use gun");
+                        Console.WriteLine("ui:  use your items");
+                        Console.WriteLine("di:  view dealer's items");
+                        Console.WriteLine("h:   look at health");
 
                         // Get input
                         input = Console.ReadLine().Trim().ToLower();
@@ -345,24 +357,6 @@ namespace TextShot
                             Console.WriteLine($"You have {p.Health} health and the dealer has {d.Health} health\n");
                         } 
                     }
-                }
-
-
-                // =====================
-                // Dealer Turn
-                else if (CurrentState == State.DealerSTurn)
-                {
-                    // Establish your turn
-                    Console.WriteLine("\nIt's the Dealer's turn");
-
-                    // Use SyringeShot (test)
-                    
-
-                    // break; // work in progress
-
-                    // Continue
-                    PlayerTurn = !PlayerTurn;
-                    CurrentState = State.PreTurnDecisions;
                 }
 
 
@@ -442,6 +436,24 @@ namespace TextShot
 
 
                 // =====================
+                // Dealer Turn
+                else if (CurrentState == State.DealerSTurn)
+                {
+                    // Establish your turn
+                    Console.WriteLine("\nIt's the Dealer's turn");
+
+                    // Use SyringeShot (test)
+                    
+
+                    // break; // work in progress
+
+                    // Continue (wip code)
+                    PlayerTurn = !PlayerTurn;
+                    CurrentState = State.PreTurnDecisions;
+                }
+
+
+                // =====================
                 // Dealer Decisions
                 else if (CurrentState == State.DealerDecide)
                 {
@@ -467,12 +479,26 @@ namespace TextShot
 
                     // Print Bullet
                     if (Debug) { Console.WriteLine($"Debug Current Bullet: {isLive}"); }
+                    if (isLive) { Console.WriteLine("\nBANG\n\nit was a live bullet"); } else { Console.WriteLine("D\nBANG\n\nit was a dud bullet"); }
 
                     // Remove Health
                     if (isLive)
                     {
-                        if (GunFrom) { p.Health--; } else { d.Health--; }
+                        if (GunTo) { p.Health--; } else { d.Health--; }
+
+                        // Double Damage from infectedBullet
+                        if (InfectedIsBullet)
+                        {
+                            if (GunTo) { p.Health--; } else { d.Health--; }
+                            if (Debug) { Console.WriteLine("Debug Double Damage from Infected Bullet used up"); }
+                        }
                     }
+                    InfectedIsBullet = false;
+
+                    // Print Health
+                    if (Debug) { Console.WriteLine($"Debug Player Health: {p.Health}"); }
+                    if (Debug) { Console.WriteLine($"Debug Dealer Health: {d.Health}"); }
+                    Console.WriteLine($"Your health is now {Program.p.Health} \nThe Dealer's health is now {Program.d.Health}");
 
                     // Eject Bullet
                     Gun.EjectCurBullet();
@@ -490,6 +516,8 @@ namespace TextShot
                 // End Round
                 else if (CurrentState == State.RoundEnd)
                 {
+                    // Announce Round End
+                    Console.WriteLine("Round ended");
                     break; // work in progress
                 }
 

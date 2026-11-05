@@ -10,6 +10,9 @@ namespace TextShot
         override public void ExecuteEffect()
         {
             base.ExecuteEffect();
+
+            // Sets the current bullet to double damage
+            Program.InfectedIsBullet = true;
         }
     }
 }
