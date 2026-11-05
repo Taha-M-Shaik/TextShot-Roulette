@@ -18,8 +18,8 @@ namespace TextShot
             RoundStart,         // Start of Round, Set Health, Empty Inventories
             LoadGun,            // Load gun
             PreTurnDecisions,   // Any events that need to be processed before next turn, then deciding whose turn
-            PlayerTurn,         // Player chooses between using item or shooting gun
-            DealerTurn,         // Start of Dealer's Turn
+            PlayerSTurn,         // Player chooses between using item or shooting gun
+            DealerSTurn,         // Start of Dealer's Turn
             PickItem,           // Pick Item
             DealerDecide,       // Dealer Decision Algorithm
             ShootGun,           // Use the gun to shoot, discard bullet
@@ -89,8 +89,8 @@ namespace TextShot
                 // State Change Detector
                 if (CurrentState != PrevState)
                 {
+                    if (Debug) { Console.WriteLine($"\nDebug State changed from {PrevState} to {CurrentState}\n"); }
                     PrevState = CurrentState;
-                    if (Debug) { Console.WriteLine($"\nDebug State changed to {CurrentState}\n"); }
                 }
 
 
@@ -126,13 +126,12 @@ namespace TextShot
                     // Enter Name
                     Console.WriteLine("Enter Name:");
                     PlayerName = Console.ReadLine();
-                    if (Debug) { Console.WriteLine($"Debug Name Entered: {PlayerName}"); }
-
-                    // Dealer Greeting Message
-                    Console.WriteLine($"\nGreetings, {PlayerName}\nI hope you know how to play (Y/n)");
 
                     // Dev Breakpoint
-                    if (PlayerName == "dev") { break; }
+                    if (PlayerName == "dev" || PlayerName == "d") { Debug = true; Console.WriteLine($"Debug Enabled\nDebug Name Entered: {PlayerName}"); }
+
+                    // Dealer Greeting Message
+                    Console.WriteLine($"\nGreetings, {PlayerName}\nI hope you know how to play (y/n)");
 
                     // Transition to RoundStart
                     string knowGame = Console.ReadLine().Trim().ToLower();
@@ -258,21 +257,33 @@ namespace TextShot
                         HandCuffed = false;
                     }
 
-                    // Determine whose turn it is
-                    if (PlayerTurn)
+
+                    // Check if gun is empty
+                    if (Gun.Bullets.Count == 0)
                     {
-                        CurrentState = State.PlayerTurn;
+                        // Transition to LoadGun
+                        Console.WriteLine("The gun is empty");
+                        CurrentState = State.LoadGun;
+                        if (Debug) { Console.WriteLine("Debug Gun empty, transition to LoadGun"); }
                     }
-                    else
+                    else // Bullets remain
                     {
-                        CurrentState = State.DealerTurn;
+                        // Determine whose turn it is
+                        if (PlayerTurn)
+                        {
+                            CurrentState = State.PlayerSTurn;
+                        }
+                        else
+                        {
+                            CurrentState = State.DealerSTurn;
+                        }
                     }
                 }
 
 
                 // ================================
                 // Player Turn
-                else if (CurrentState == State.PlayerTurn)
+                else if (CurrentState == State.PlayerSTurn)
                 {
                     // Establish your turn
                     Console.WriteLine("\nIt's your turn");
@@ -281,7 +292,7 @@ namespace TextShot
                     // Mini State machine in the player's turn
                     while (true)
                     {
-                        if (Debug) { Console.WriteLine("Debug Currently inside PlayerTurn State Machine\n"); }
+                        if (Debug) { Console.WriteLine("Debug Currently inside PlayerSTurn State Machine\n"); }
 
                         // Show avilable Commands
                         Console.WriteLine("Options:\n");
@@ -350,21 +361,19 @@ namespace TextShot
 
                 // ================================
                 // Dealer Turn
-                else if (CurrentState == State.DealerTurn)
+                else if (CurrentState == State.DealerSTurn)
                 {
                     // Establish your turn
-                    Console.WriteLine("\nIt's your turn");
+                    Console.WriteLine("\nIt's the Dealer's turn");
 
                     // Use SyringeShot (test)
-                    try
-                    {
-                        Item s = d.Inventory.FetchItem("Syringe Shot");
-                        s.ExecuteEffect();
-                        if (Debug) { Console.WriteLine("Debug DEALER USED SYRINGE!!!"); }
-                    }
-                    finally { /*nothing lol*/ }
+                    
 
-                    break; // work in progress
+                    // break; // work in progress
+
+                    // Continue
+                    PlayerTurn = !PlayerTurn;
+                    CurrentState = State.PreTurnDecisions;
                 }
 
 
@@ -419,7 +428,7 @@ namespace TextShot
                     
                     if (input == "c") // Cancel (go back to player turn)
                     {
-                        CurrentState = State.PlayerTurn;
+                        CurrentState = State.PlayerSTurn;
                     }
                     else if (availableOptions.ContainsKey(input))
                     {
@@ -433,7 +442,7 @@ namespace TextShot
                         {
                             Console.WriteLine($"\nYou used the {selectedItem.Name}!\n");
                             selectedItem.ExecuteEffect();
-                            CurrentState = State.PlayerTurn;
+                            CurrentState = State.PlayerSTurn;
                         }
                     }
                     else
