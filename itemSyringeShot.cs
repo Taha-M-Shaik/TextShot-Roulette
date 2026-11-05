@@ -4,7 +4,7 @@ namespace TextShot
 {
     public class SyringeShot : Item
     {
-        public SyringeShot() : base("Syringe Shot", "Heals 1 point")
+        public SyringeShot() : base("Syringe Shot", "Heals 1 health point (doesn't exceed max health)")
         {}
         
         override public void ExecuteEffect()
