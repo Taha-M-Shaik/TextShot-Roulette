@@ -40,6 +40,7 @@ namespace TextShot
         // New Random
         public static Random r;
 
+
         // =====================
         // Gun
         public static Gun Gun = null;
@@ -51,13 +52,12 @@ namespace TextShot
         // Participants
         public static Player p;
         public static Dealer d;
-
-        // Player Name
-        public static string PlayerName = "";
-
-        public static string input;
-
         public static int MaxHealth;
+        public static string DealerTargetItem = ""; // Tells steal items what to target
+
+        // Player inputs
+        public static string PlayerName = "";
+        public static string input;
 
 
         // =====================
@@ -151,7 +151,7 @@ namespace TextShot
                     Console.ReadLine();
                     Console.WriteLine("You can look at your items from your inventory.\n(Press Enter to continue)");
                     Console.ReadLine();
-                    Console.WriteLine("You can also look at the my items (the dealer's items).\nYou can also look at our healths.\n(Press Enter to continue)");
+                    Console.WriteLine("You can also look at the my items (the Dealer's items).\nYou can also look at our healths.\n(Press Enter to continue)");
                     Console.ReadLine();
                     Console.WriteLine("You can either shoot me, or yourself.\n(Press Enter to continue)");
                     Console.ReadLine();
@@ -214,6 +214,9 @@ namespace TextShot
                     int numOfBullets = r.Next(2, 8);
                     Gun = new Gun(numOfBullets);
                     Gun.Load(numOfBullets);
+
+                    // Initialize Dealer's memory
+                    d.InitializeKnowledge(Gun.LiveBullets, Gun.DudBullets);
 
                     // Shuffle the array to randomize bullet order (Fisher-Yates shuffle)
                     Gun.Shuffle();
@@ -299,7 +302,7 @@ namespace TextShot
                         Console.WriteLine("Options:\n");
                         Console.WriteLine("g:   use gun");
                         Console.WriteLine("ui:  use your items");
-                        Console.WriteLine("di:  view dealer's items");
+                        Console.WriteLine("di:  view the Dealer's items");
                         Console.WriteLine("h:   look at health");
 
                         // Get input
@@ -354,7 +357,7 @@ namespace TextShot
                         }
                         else if (input == "h")
                         {
-                            Console.WriteLine($"You have {p.Health} health and the dealer has {d.Health} health\n");
+                            Console.WriteLine($"You have {p.Health} health and the Dealer has {d.Health} health\n");
                         } 
                     }
                 }
@@ -442,14 +445,11 @@ namespace TextShot
                     // Establish your turn
                     Console.WriteLine("\nIt's the Dealer's turn");
 
-                    // Use SyringeShot (test)
-                    
+                    // Print DealerKnowldege
+                    if (Debug) { d.PrintKnowledge(); }
 
-                    // break; // work in progress
-
-                    // Continue (wip code)
-                    PlayerTurn = !PlayerTurn;
-                    CurrentState = State.PreTurnDecisions;
+                    // Continue to decisions
+                    CurrentState = State.DealerDecide;
                 }
 
 
@@ -457,7 +457,57 @@ namespace TextShot
                 // Dealer Decisions
                 else if (CurrentState == State.DealerDecide)
                 {
-                    break; // work in progress
+                    // Heal
+                    while (true)
+                    {
+                        // Heal if health is not max
+                        if (d.Health < d.MaxHealth)
+                        {
+                            if (Debug) { Console.WriteLine("Debug Dealer Decide: needs healing"); }
+
+                            // Check if items are available (Syringe Shot or Expired Medicine)
+                            if (d.HasItem("Syringe Shot"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Syringe Shot"); }
+                                d.UseItem("Syringe Shot");
+                            }
+                            else if (d.HasItem("Expired Medicine"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Expired Medicine"); }
+                                d.UseItem("Expired Medicine");
+                            }
+
+                            // Steal healing item if possible
+                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Syringe Shot"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Bugged Circuit Board to steal Syringe Shot"); }
+                                
+                                // Set the target for the item to read
+                                Program.DealerTargetItem = "Syringe Shot"; 
+                                
+                                d.UseItem("Bugged Circuit Board");
+                            }
+                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Expired Medicine"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Bugged Circuit Board to steal Expired Medicine"); }
+                                
+                                // Set the target for the item to read
+                                Program.DealerTargetItem = "Expired Medicine"; 
+                                
+                                d.UseItem("Bugged Circuit Board");
+                            }
+                            else
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: can't heal"); }
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (Debug) { Console.WriteLine("Debug Dealer Decide: doesn't need healing"); }
+                            break;
+                        }
+                    }
                 }
 
 
@@ -502,6 +552,9 @@ namespace TextShot
 
                     // Eject Bullet
                     Gun.EjectCurBullet();
+
+                    // Dealer forgets the bullet that just left the gun
+                    d.RemoveTopBullet(isLive);
 
                     // Print new Bullet and Bullets left
                     if (Debug) { Console.WriteLine($"Debug New Bullet: {isLive}"); }
