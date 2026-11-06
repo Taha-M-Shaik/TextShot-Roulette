@@ -31,7 +31,7 @@ namespace TextShot
             _knownDud = 0;
         }
 
-        public void InitializeKnowledge(int liveCount, int dudCount)
+        public void InitialiseKnowledge(int liveCount, int dudCount)
         {
             ClearKnowledge();
             _knownLive = liveCount;

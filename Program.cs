@@ -221,8 +221,8 @@ namespace TextShot
                     Gun = new Gun(numOfBullets);
                     Gun.Load(numOfBullets);
 
-                    // Initialize Dealer's memory
-                    d.InitializeKnowledge(Gun.LiveBullets, Gun.DudBullets);
+                    // Initialise Dealer's memory
+                    d.InitialiseKnowledge(Gun.LiveBullets, Gun.DudBullets);
 
                     // Shuffle the array to randomize bullet order (Fisher-Yates shuffle)
                     Gun.Shuffle();
