@@ -16,7 +16,8 @@ namespace TextShot
             Start,              // Start of game
             Name,               // Entering Name
             ExplainGame,        // Explains the game
-            RoundStart,         // Start of Round, Set Health, Empty Inventories
+            IntialiseGame,      // Initialises the game, set Health
+            RoundStart,         // Start of Round, populate/repopulate Inventories
             LoadGun,            // Load gun
             PreTurnDecisions,   // Any events that need to be processed before next turn, then deciding whose turn
             PlayerSTurn,         // Player chooses between using item or shooting gun
@@ -80,14 +81,6 @@ namespace TextShot
                     if (Debug) { Console.WriteLine($"\nDebug State changed from {PrevState} to {CurrentState}\n"); }
                     PrevState = CurrentState;
                 }
-
-
-
-                // ===============================
-                // Test Code (Priority)
-                // ===============================
-
-                // Test Code here
 
 
 
@@ -170,7 +163,23 @@ namespace TextShot
                     {
                         CurrentState = State.ExplainGame;
                     }
-                    CurrentState = State.RoundStart;
+                    CurrentState = State.IntialiseGame;
+                }
+
+
+                // =====================
+                // Intialise Game
+                else if (CurrentState == State.IntialiseGame)
+                {
+                    // Set MaxHealth
+                    MaxHealth = r.Next(2, 5);
+
+                    // Create Participants
+                    p = new Player(PlayerName, MaxHealth);
+                    d = new Dealer("Dealer", MaxHealth);
+                    Console.WriteLine($"\nYou and I have {MaxHealth} health");
+                    if (Debug) { Console.WriteLine($"Debug Player {MaxHealth} health, Dealer {MaxHealth} health"); }
+
                 }
 
 
@@ -180,15 +189,6 @@ namespace TextShot
                 {
                     // New Random
                     r = new Random();
-
-                    // Set MaxHealth
-                    MaxHealth = r.Next(2, 5);
-
-                    // Create Participants
-                    p = new Player(PlayerName, MaxHealth);
-                    d = new Dealer("Dealer", MaxHealth);
-                    Console.WriteLine($"\nYou and I have {MaxHealth} health");
-                    if (Debug) { Console.WriteLine($"Debug Player {MaxHealth} health, Dealer {MaxHealth} health"); }
 
                     // Empty Inventories
                     p.ClearInventory();
@@ -258,6 +258,7 @@ namespace TextShot
                     {
                         // Transition to RoundStart
                         Console.WriteLine("The gun is empty");
+                        Console.WriteLine("Your and the Dealer's Inventories are cleared and reset");
                         CurrentState = State.RoundStart;
                         if (Debug) { Console.WriteLine("Debug Gun empty, transition to RoundStart"); }
                     }
@@ -267,7 +268,7 @@ namespace TextShot
                     if (p.Health <= 0 || d.Health <= 0)
                     {
                         // Transition to RoundEnd
-                        CurrentState = State.RoundEnd;
+                        CurrentState = State.GameOver;
                         if (Debug) { Console.WriteLine($"Debug Player {p.Health} health, Dealer {d.Health} health"); }
                     }
                 }
@@ -682,17 +683,26 @@ namespace TextShot
                     // Turn & Handcuff Logic
                     bool shotSelf = (GunFrom == GunTo);
 
-                    if (!isLive && shotSelf)
+                    if (shotSelf)
                     {
-                        // Shot self with a dud -> Keep turn! (Handcuffs stay active until turn actually passes)
-                        Console.WriteLine(GunFrom ? "\nIt was a dud! You get to go again." : "\nIt was a dud! The Dealer goes again.");
+                        if (!isLive)
+                        {
+                            // 1. Shot self with a dud -> Keep turn! (Handcuffs stay saved for later)
+                            Console.WriteLine(GunFrom ? "\nIt was a dud! You get to go again." : "\nIt was a dud! The Dealer goes again.");
+                        }
+                        else
+                        {
+                            // 2. Shot self with a live -> Turn swaps (and resets any active handcuffs)
+                            HandCuffed = false;
+                            PlayerTurn = !PlayerTurn;
+                        }
                     }
                     else
                     {
-                        // Turn normally passes to the other participant
+                        // 3. Shot the opponent (live or dud) -> Turn tries to pass to opponent
                         if (HandCuffed)
                         {
-                            // Handcuffs skip the opponent's turn, so PlayerTurn stays with the current shooter
+                            // Handcuffs skip the opponent's turn, so PlayerTurn stays with the shooter
                             Console.WriteLine(GunFrom ? "\nThe Dealer is handcuffed! Their turn is skipped." : "\nYou are handcuffed! Your turn is skipped.");
                             if (Debug) { Console.WriteLine("Debug Handcuffed used up, skipping opponent's turn"); }
                             HandCuffed = false;
@@ -705,6 +715,15 @@ namespace TextShot
                     }
 
                     CurrentState = State.PreTurnDecisions;
+                }
+
+                // =====================
+                // Game Over
+                else if (CurrentState == State.GameOver)
+                {
+                    if (Debug) { Console.WriteLine("Debug Game Over"); }
+                    Console.WriteLine("\nGame Over");
+                    break;
                 }
             }
         }
