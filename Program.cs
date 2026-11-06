@@ -24,7 +24,6 @@ namespace TextShot
             PickItem,           // Pick Item
             DealerDecide,       // Dealer Decision Algorithm
             ShootGun,           // Use the gun to shoot, discard bullet
-            RoundEnd,           // End of Round
             GameOver            // Show Stats, end program
         };
 
@@ -278,8 +277,7 @@ namespace TextShot
                     // End round if either participant is dead
                     if (p.Health == 0 || d.Health == 0)
                     {
-                        // Transition to RoundEnd
-                        CurrentState = State.RoundEnd;
+                        // Transition to GameOver
                         if (Debug) { Console.WriteLine($"Debug Player {p.Health} health, Dealer {d.Health} health"); }
                     }
                 }
@@ -701,19 +699,13 @@ namespace TextShot
 
 
                 // =====================
-                // End Round
-                else if (CurrentState == State.RoundEnd)
-                {
-                    // Announce Round End
-                    Console.WriteLine("Round ended");
-                    break; // work in progress
-                }
-
-
-                // =====================
                 // Game over
                 else if (CurrentState == State.GameOver)
                 {
+                    Console.WriteLine("Game Over!");
+                    if (p.Health <= 0) { Console.WriteLine("You lost!"); }
+                    else { Console.WriteLine("You won!"); }
+                    if (Debug) { Console.WriteLine("Debug Game Over"); }
                     break; // work in progress
                 }
             }
