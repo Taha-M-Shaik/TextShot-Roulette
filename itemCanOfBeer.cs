@@ -12,11 +12,14 @@ namespace TextShot
             base.ExecuteEffect();
 
             // Read current bullet
-            Console.Write("Bullet ejected: ");
-            Program.Gun.PrintCurBullet();
-
-            // Eject curent bullet
+            bool wasLive = Program.Gun.ReadCurBullent();
+            Console.WriteLine($"You popped a {(wasLive ? "LIVE" : "DUD")} bullet out of the gun!");
+            
+            // Eject current bullet
             Program.Gun.EjectCurBullet();
+            
+            // Dealer logs the ejected bullet and runs deductions
+            Program.d.RemoveTopBullet(wasLive);
         }
     }
 }

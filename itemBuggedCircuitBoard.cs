@@ -89,13 +89,26 @@ namespace TextShot
             }
             else
             {
-                // Dealer logic (Dealer steals a random item)
-                Random r = new Random();
-                int randomIndex = r.Next(victim.Inventory.Items.Count);
+                Item stolenItem = null;
+
+                // Try to steal the specific target if the Dealer set one
+                if (!string.IsNullOrEmpty(Program.DealerTargetItem))
+                {
+                    stolenItem = victim.Inventory.FetchItem(Program.DealerTargetItem);
+                    Program.DealerTargetItem = ""; // Reset it so it doesn't affect future turns
+                }
+
+                // Fallback to a random item if no target was set or the player didn't actually have it
+                if (stolenItem == null)
+                {
+                    Random r = new Random();
+                    int randomIndex = r.Next(victim.Inventory.Items.Count);
+                    
+                    stolenItem = victim.Inventory.Items[randomIndex];
+                    victim.Inventory.FetchItem(stolenItem.Name); // Remove it from player
+                }
                 
-                Item stolenItem = victim.Inventory.Items[randomIndex];
-                victim.Inventory.FetchItem(stolenItem.Name); // Remove it from player
-                thief.Inventory.AddItem(stolenItem);         // Add it to dealer
+                thief.Inventory.AddItem(stolenItem); // Add it to dealer
 
                 Console.WriteLine($"The Dealer stole your {stolenItem.Name}!");
             }
