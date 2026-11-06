@@ -241,17 +241,6 @@ namespace TextShot
                     r = new Random();
                     if (Debug) { Console.WriteLine("Debug New Random"); }
 
-                    // Determine whose turn it is
-                    if (Debug) { Console.WriteLine($"Debug Handcuffs value: {HandCuffed}"); }
-                    if (HandCuffed)
-                    {
-                        // Skip the next player's turn
-                        PlayerTurn = !PlayerTurn;
-                        if (Debug) { Console.WriteLine($"Debug Handcuffed used up, skipping turn"); }
-                        Console.WriteLine("Handcuffs used up, skipping turn");
-                        HandCuffed = false;
-                    }
-
                     // =====================
                     // Determine whose turn it is
                     if (PlayerTurn)
@@ -275,9 +264,10 @@ namespace TextShot
 
                     // =====================
                     // End round if either participant is dead
-                    if (p.Health == 0 || d.Health == 0)
+                    if (p.Health <= 0 || d.Health <= 0)
                     {
-                        // Transition to GameOver
+                        // Transition to RoundEnd
+                        CurrentState = State.RoundEnd;
                         if (Debug) { Console.WriteLine($"Debug Player {p.Health} health, Dealer {d.Health} health"); }
                     }
                 }
@@ -657,7 +647,7 @@ namespace TextShot
 
                     // Print Bullet
                     if (Debug) { Console.WriteLine($"Debug Current Bullet: {isLive}"); }
-                    if (isLive) { Console.WriteLine("\nBANG\n\nit was a live bullet"); } else { Console.WriteLine("D\nBANG\n\nit was a dud bullet"); }
+                    if (isLive) { Console.WriteLine("\nBANG\n\nit was a live bullet"); } else { Console.WriteLine("\nCLICK\n\nit was a dud bullet"); }
 
                     // Remove Health
                     if (isLive)
@@ -670,11 +660,6 @@ namespace TextShot
                             if (GunTo) { p.Health--; } else { d.Health--; }
                             if (Debug) { Console.WriteLine("Debug Double Damage from Infected Bullet used up"); }
                         }
-                    }
-                    else
-                    {
-                        // Flip turns since it was a dud
-                        PlayerTurn = !PlayerTurn;
                     }
                     InfectedIsBullet = false;
 
@@ -692,21 +677,34 @@ namespace TextShot
                     // Print new Bullet and Bullets left
                     if (Debug) { Console.WriteLine($"Debug New Bullet: {isLive}"); }
 
-                    // Return to Pre-Turn Decisions
-                    PlayerTurn = !PlayerTurn; // Flip turn
+
+                    // =====================
+                    // Turn & Handcuff Logic
+                    bool shotSelf = (GunFrom == GunTo);
+
+                    if (!isLive && shotSelf)
+                    {
+                        // Shot self with a dud -> Keep turn! (Handcuffs stay active until turn actually passes)
+                        Console.WriteLine(GunFrom ? "\nIt was a dud! You get to go again." : "\nIt was a dud! The Dealer goes again.");
+                    }
+                    else
+                    {
+                        // Turn normally passes to the other participant
+                        if (HandCuffed)
+                        {
+                            // Handcuffs skip the opponent's turn, so PlayerTurn stays with the current shooter
+                            Console.WriteLine(GunFrom ? "\nThe Dealer is handcuffed! Their turn is skipped." : "\nYou are handcuffed! Your turn is skipped.");
+                            if (Debug) { Console.WriteLine("Debug Handcuffed used up, skipping opponent's turn"); }
+                            HandCuffed = false;
+                        }
+                        else
+                        {
+                            // Normal turn switch
+                            PlayerTurn = !PlayerTurn;
+                        }
+                    }
+
                     CurrentState = State.PreTurnDecisions;
-                }
-
-
-                // =====================
-                // Game over
-                else if (CurrentState == State.GameOver)
-                {
-                    Console.WriteLine("Game Over!");
-                    if (p.Health <= 0) { Console.WriteLine("You lost!"); }
-                    else { Console.WriteLine("You won!"); }
-                    if (Debug) { Console.WriteLine("Debug Game Over"); }
-                    break; // work in progress
                 }
             }
         }
