@@ -683,26 +683,17 @@ namespace TextShot
                     // Turn & Handcuff Logic
                     bool shotSelf = (GunFrom == GunTo);
 
-                    if (shotSelf)
+                    if (!isLive && shotSelf)
                     {
-                        if (!isLive)
-                        {
-                            // 1. Shot self with a dud -> Keep turn! (Handcuffs stay saved for later)
-                            Console.WriteLine(GunFrom ? "\nIt was a dud! You get to go again." : "\nIt was a dud! The Dealer goes again.");
-                        }
-                        else
-                        {
-                            // 2. Shot self with a live -> Turn swaps (and resets any active handcuffs)
-                            HandCuffed = false;
-                            PlayerTurn = !PlayerTurn;
-                        }
+                        // Shot self with a dud -> Keep turn! (Handcuffs stay active until turn actually passes)
+                        Console.WriteLine(GunFrom ? "\nIt was a dud! You get to go again." : "\nIt was a dud! The Dealer goes again.");
                     }
                     else
                     {
-                        // 3. Shot the opponent (live or dud) -> Turn tries to pass to opponent
+                        // Triggers on: shooting opponent (live/dud) OR shooting self with a live bullet
                         if (HandCuffed)
                         {
-                            // Handcuffs skip the opponent's turn, so PlayerTurn stays with the shooter
+                            // Handcuffs skip the opponent's turn, so PlayerTurn stays with the current shooter
                             Console.WriteLine(GunFrom ? "\nThe Dealer is handcuffed! Their turn is skipped." : "\nYou are handcuffed! Your turn is skipped.");
                             if (Debug) { Console.WriteLine("Debug Handcuffed used up, skipping opponent's turn"); }
                             HandCuffed = false;
