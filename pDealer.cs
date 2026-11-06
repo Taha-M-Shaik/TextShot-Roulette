@@ -24,9 +24,16 @@ namespace TextShot
         }
 
         // Pass the gun's exact initial loadout when the round starts
+        public void ClearKnowledge()
+        {
+            KnownBullets.Clear();
+            _knownLive = 0;
+            _knownDud = 0;
+        }
+
         public void InitializeKnowledge(int liveCount, int dudCount)
         {
-            ClearKnowledge
+            ClearKnowledge();
             _knownLive = liveCount;
             _knownDud = dudCount;
             int totalBullets = liveCount + dudCount;
@@ -65,13 +72,6 @@ namespace TextShot
                 // Run the deduction algorithm on the remaining bullets
                 DeduceRemainingBullets();
             }
-        }
-
-        public void ClearKnowledge()
-        {
-            KnownBullets.Clear();
-            _knownLive = 0;
-            _knownDud = 0;
         }
 
         public void PrintKnowledge()

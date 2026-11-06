@@ -30,5 +30,21 @@ namespace TextShot
             Inventory.ClearOutInventory();
             if (Program.Debug) Console.WriteLine($"Debug {Name}'s Inventory cleared");
         }
+
+        // Using Items
+            public bool HasItem(string itemName)
+        {
+            return _inventory.Items.Exists(i => i.Name.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void UseItem(string itemName)
+        {
+            Item item = _inventory.FetchItem(itemName);
+            if (item != null)
+            {
+                Console.WriteLine($"\n{Name} used {item.Name}!");
+                item.ExecuteEffect();
+            }
+        }
     }
 }

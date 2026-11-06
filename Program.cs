@@ -461,7 +461,7 @@ namespace TextShot
                     while (true)
                     {
                         // Heal if health is not max
-                        if (d.Health < d.MaxHealth)
+                        if (d.Health < MaxHealth)
                         {
                             if (Debug) { Console.WriteLine("Debug Dealer Decide: needs healing"); }
 
