@@ -197,7 +197,7 @@ namespace TextShot
 
                     // Populate Inventories
                     int InveAmount = r.Next(2, 5);
-                    p.Inventory.PopulateInventory(13);
+                    p.Inventory.PopulateInventory(InveAmount);
                     d.Inventory.PopulateInventory(InveAmount);
 
                     // Transition to LoadGun
@@ -268,10 +268,10 @@ namespace TextShot
                     // Check if gun is empty (overrides turn decisions)
                     if (Gun.Bullets.Count == 0)
                     {
-                        // Transition to LoadGun
+                        // Transition to RoundStart
                         Console.WriteLine("The gun is empty");
-                        CurrentState = State.LoadGun;
-                        if (Debug) { Console.WriteLine("Debug Gun empty, transition to LoadGun"); }
+                        CurrentState = State.RoundStart;
+                        if (Debug) { Console.WriteLine("Debug Gun empty, transition to RoundStart"); }
                     }
 
                     // =====================
@@ -457,10 +457,10 @@ namespace TextShot
                 // Dealer Decisions
                 else if (CurrentState == State.DealerDecide)
                 {
-                    // Heal
+                    // 1. Heal Loop
                     while (true)
                     {
-                        // Heal if health is not max
+                        // Heal if health is not max (using Program.MaxHealth)
                         if (d.Health < MaxHealth)
                         {
                             if (Debug) { Console.WriteLine("Debug Dealer Decide: needs healing"); }
@@ -470,31 +470,28 @@ namespace TextShot
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Syringe Shot"); }
                                 d.UseItem("Syringe Shot");
+                                Console.ReadLine();
                             }
                             else if (d.HasItem("Expired Medicine"))
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Expired Medicine"); }
                                 d.UseItem("Expired Medicine");
+                                Console.ReadLine();
                             }
-
                             // Steal healing item if possible
                             else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Syringe Shot"))
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Bugged Circuit Board to steal Syringe Shot"); }
-                                
-                                // Set the target for the item to read
                                 Program.DealerTargetItem = "Syringe Shot"; 
-                                
                                 d.UseItem("Bugged Circuit Board");
+                                Console.ReadLine();
                             }
                             else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Expired Medicine"))
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Bugged Circuit Board to steal Expired Medicine"); }
-                                
-                                // Set the target for the item to read
                                 Program.DealerTargetItem = "Expired Medicine"; 
-                                
                                 d.UseItem("Bugged Circuit Board");
+                                Console.ReadLine();
                             }
                             else
                             {
@@ -507,6 +504,139 @@ namespace TextShot
                             if (Debug) { Console.WriteLine("Debug Dealer Decide: doesn't need healing"); }
                             break;
                         }
+                    }
+
+                    // 2. Use Hand Cuffs (if not already active)
+                    if (!HandCuffed)
+                    {
+                        if (d.HasItem("Hand Cuffs"))
+                        {
+                            if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Hand Cuffs"); }
+                            d.UseItem("Hand Cuffs");
+                                Console.ReadLine();
+                        }
+                        else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Hand Cuffs"))
+                        {
+                            if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Hand Cuffs"); }
+                            Program.DealerTargetItem = "Hand Cuffs";
+                            d.UseItem("Bugged Circuit Board");
+                            if (d.HasItem("Hand Cuffs")) { d.UseItem("Hand Cuffs"); }
+                            Console.ReadLine();
+                        }
+                    }
+
+                    // 3. If bullet order is NOT completely known (or current bullet is Unknown)
+                    if (d.KnownBullets.Contains(BulletKnowledge.Unknown))
+                    {
+                        if (Debug) { Console.WriteLine("Debug Dealer Decide: Bullet order not completely known"); }
+
+                        // Use Can of Beer if the current bullet is unknown (keep at least 1 bullet in the gun to shoot)
+                        if (d.KnownBullets.Count > 1 && d.KnownBullets[0] == BulletKnowledge.Unknown)
+                        {
+                            if (d.HasItem("Can of Beer"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Can of Beer"); }
+                                d.UseItem("Can of Beer");
+                                Console.ReadLine();
+                            }
+                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Can of Beer"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Can of Beer"); }
+                                Program.DealerTargetItem = "Can of Beer";
+                                d.UseItem("Bugged Circuit Board");
+                                if (d.HasItem("Can of Beer")) { d.UseItem("Can of Beer"); }
+                                Console.ReadLine();
+                            }
+                        }
+
+                        // If the gun was emptied by Can of Beer, return to PreTurnDecisions to reload
+                        if (Gun.Bullets.Count == 0)
+                        {
+                            CurrentState = State.PreTurnDecisions;
+                            continue;
+                        }
+
+                        // Use Magnifying Glass if the current bullet is still unknown
+                        if (d.KnownBullets.Count > 0 && d.KnownBullets[0] == BulletKnowledge.Unknown)
+                        {
+                            if (d.HasItem("Magnifying Glass"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Magnifying Glass"); }
+                                d.UseItem("Magnifying Glass");
+                                Console.ReadLine();
+                            }
+                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Magnifying Glass"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Magnifying Glass"); }
+                                Program.DealerTargetItem = "Magnifying Glass";
+                                d.UseItem("Bugged Circuit Board");
+                                if (d.HasItem("Magnifying Glass")) { d.UseItem("Magnifying Glass"); }
+                                Console.ReadLine();
+                            }
+                        }
+                    }
+
+                    Console.WriteLine("Dealer has decided what to do\n");
+                    Console.ReadLine();
+
+                    // 4. Decide who to shoot based on current bullet knowledge
+                    GunFrom = false; // False = Dealer is holding the gun
+                    BulletKnowledge currentBullet = d.KnownBullets.Count > 0 ? d.KnownBullets[0] : BulletKnowledge.Unknown;
+
+                    if (currentBullet == BulletKnowledge.Live)
+                    {
+                        if (Debug) { Console.WriteLine("Debug Dealer Decide: Current bullet is KNOWN LIVE -> Shoot Player"); }
+
+                        // Use Infected Bullet if not already active
+                        if (!InfectedIsBullet)
+                        {
+                            if (d.HasItem("Infected bullet"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Infected bullet"); }
+                                d.UseItem("Infected bullet");
+                                Console.ReadLine();
+                            }
+                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Infected bullet"))
+                            {
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Infected bullet"); }
+                                Program.DealerTargetItem = "Infected bullet";
+                                d.UseItem("Bugged Circuit Board");
+                                if (d.HasItem("Infected bullet")) { d.UseItem("Infected bullet"); }
+                                Console.ReadLine();
+                            }
+                        }
+
+                        Console.WriteLine("\nThe Dealer points the gun at you and pulls the trigger...");
+                        Console.ReadLine();
+                        GunTo = true; // True = Shoot Player
+                        CurrentState = State.ShootGun;
+                    }
+                    else if (currentBullet == BulletKnowledge.Dud)
+                    {
+                        if (Debug) { Console.WriteLine("Debug Dealer Decide: Current bullet is KNOWN DUD -> Shoot Self"); }
+                        Console.WriteLine("\nThe Dealer points the gun at themselves and pulls the trigger...");
+                        Console.ReadLine();
+                        GunTo = false; // False = Shoot Dealer
+                        CurrentState = State.ShootGun;
+                    }
+                    else
+                    {
+                        // Next bullet is still Unknown -> Randomly shoot self or player
+                        bool shootPlayer = (r.Next(0, 2) == 0);
+                        if (Debug) { Console.WriteLine($"Debug Dealer Decide: Current bullet is UNKNOWN -> Randomly shooting {(shootPlayer ? "Player" : "Self")}"); }
+
+                        if (shootPlayer)
+                        {
+                            Console.WriteLine("\nThe Dealer hesitates, then points the gun at you...");
+                            GunTo = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nThe Dealer hesitates, then points the gun at themselves...");
+                            GunTo = false;
+                        }
+                        Console.ReadLine();
+                        CurrentState = State.ShootGun;
                     }
                 }
 
@@ -542,6 +672,11 @@ namespace TextShot
                             if (GunTo) { p.Health--; } else { d.Health--; }
                             if (Debug) { Console.WriteLine("Debug Double Damage from Infected Bullet used up"); }
                         }
+                    }
+                    else
+                    {
+                        // Flip turns since it was a dud
+                        PlayerTurn = !PlayerTurn;
                     }
                     InfectedIsBullet = false;
 

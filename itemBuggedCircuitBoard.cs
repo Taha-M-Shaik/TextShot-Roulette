@@ -76,7 +76,13 @@ namespace TextShot
                     string fullName = availableOptions[input];
                     Item stolenItem = victim.Inventory.FetchItem(fullName);
 
-                    if (stolenItem != null)
+                    // Use 'is' to check if the object is of type BuggedCircuitBoard
+                    if (stolenItem is BuggedCircuitBoard)
+                    {
+                        Console.WriteLine("You can't use a Bugged Circuit Board on a Bugged Circuit Board!");
+                        victim.Inventory.AddItem(stolenItem); // Put it back in the dealer's inventory
+                    }
+                    else if (stolenItem != null)
                     {
                         stolenItem.ExecuteEffect();
                         Console.WriteLine($"You successfully used the {stolenItem.Name}!");
@@ -84,7 +90,7 @@ namespace TextShot
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input. The opportunity was wasted!");
+                    Console.WriteLine("Invalid input. The opportunity was wasted!(skill issue)");
                 }
             }
             else
