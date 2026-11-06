@@ -38,7 +38,7 @@ namespace TextShot
         public static bool InfectedIsBullet = false; // Keeps track if bullet is infected
         public static bool PlayerTurn = true; // Keeps track of whose turn it is, true = Player's turn
         // New Random
-        public static Random r;
+        public static Random r = new Random();
 
 
         // =====================
@@ -128,7 +128,7 @@ namespace TextShot
                     }
                     else
                     {
-                        CurrentState = State.RoundStart;
+                        CurrentState = State.IntialiseGame;
                     }
                 }
 
@@ -159,11 +159,15 @@ namespace TextShot
                         Console.WriteLine("Please answer yes or no.\n No means I will explain the game");
                         ready = Console.ReadLine().Trim().ToLower();
                     }
+
                     if (ready == "n" || ready == "no")
                     {
                         CurrentState = State.ExplainGame;
                     }
-                    CurrentState = State.IntialiseGame;
+                    else
+                    {
+                        CurrentState = State.IntialiseGame;
+                    }
                 }
 
 
@@ -171,6 +175,7 @@ namespace TextShot
                 // Intialise Game
                 else if (CurrentState == State.IntialiseGame)
                 {
+                    Console.WriteLine("You must press 'Enter' whenever you want to proceed in the game");
                     // Set MaxHealth
                     MaxHealth = r.Next(2, 5);
 
@@ -180,6 +185,8 @@ namespace TextShot
                     Console.WriteLine($"\nYou and I have {MaxHealth} health");
                     if (Debug) { Console.WriteLine($"Debug Player {MaxHealth} health, Dealer {MaxHealth} health"); }
 
+                    // Transition to RoundStart
+                    CurrentState = State.RoundStart;
                 }
 
 
