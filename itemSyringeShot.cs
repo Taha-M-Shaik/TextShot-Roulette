@@ -24,6 +24,7 @@ namespace TextShot
                     Program.p.Health = Program.MaxHealth;
                     if (Program.Debug) { Console.WriteLine("Debug Player Health capped out"); }
                 }
+                Console.WriteLine($"You heal yourself, you are now at {Program.p.Health} health");
             }
             else
             {
@@ -37,6 +38,7 @@ namespace TextShot
                     Program.d.Health = Program.MaxHealth;
                     if (Program.Debug) { Console.WriteLine("Debug Dealer Health capped out"); }
                 }
+                Console.WriteLine($"The Dealer heals themselves, they are now at {Program.p.Health} health");
             }
         }   
     }

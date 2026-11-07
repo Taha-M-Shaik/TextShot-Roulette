@@ -5,7 +5,7 @@ namespace TextShot
 {
     public class BuggedCircuitBoard : Item
     {
-        public BuggedCircuitBoard() : base("Bugged Circuit Board", "Steal one item from the other participant")
+        public BuggedCircuitBoard() : base("B.Circuit Board", "Steal one item from the other participant")
         {}
 
         override public void ExecuteEffect()
@@ -41,13 +41,13 @@ namespace TextShot
             {
                 Dictionary<string, string> itemAcronyms = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    { "Can of Beer",            "CB" },
-                    { "Expired Medicine",       "EM" },
-                    { "Hand Cuffs",             "HC" },
-                    { "Bugged Circuit Board",   "BC" },
-                    { "Infected bullet",        "IB" },
-                    { "Magnifying Glass",       "MG" },
-                    { "Syringe Shot",           "SS" }
+                    { "Can of Beer",        "CB" },
+                    { "Expired Medicine",   "EM" },
+                    { "Hand Cuffs",         "HC" },
+                    { "B.Circuit Board",    "BC" },
+                    { "Infected bullet",    "IB" },
+                    { "Magnifying Glass",   "MG" },
+                    { "Syringe Shot",       "SS" }
                 };
 
                 Dictionary<string, string> availableOptions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -79,7 +79,7 @@ namespace TextShot
                     // Use 'is' to check if the object is of type BuggedCircuitBoard
                     if (stolenItem is BuggedCircuitBoard)
                     {
-                        Console.WriteLine("You can't use a Bugged Circuit Board on a Bugged Circuit Board!");
+                        Console.WriteLine("You can't use a B.Circuit Board on a B.Circuit Board!");
                         victim.Inventory.AddItem(stolenItem); // Put it back in the dealer's inventory
                     }
                     else if (stolenItem != null)
@@ -93,7 +93,7 @@ namespace TextShot
                     Console.WriteLine("Invalid input. The opportunity was wasted!(skill issue)");
                 }
             }
-            else
+            else // use item, kept track of by DealerTargetItem
             {
                 Item stolenItem = null;
 

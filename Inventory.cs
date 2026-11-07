@@ -60,7 +60,7 @@ namespace TextShot
 
             foreach (Item item in _items)
             {
-                Console.WriteLine($"- {item.Name}: {item.Description}");
+                Console.WriteLine($"- {item.Name}:   {item.Description}");
             }
             Console.WriteLine("-------------------\n");
         }

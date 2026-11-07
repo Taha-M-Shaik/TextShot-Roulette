@@ -296,10 +296,10 @@ namespace TextShot
 
                         // Show avilable Commands
                         Console.WriteLine("Options:\n");
-                        Console.WriteLine("g:   use gun");
-                        Console.WriteLine("ui:  use your items");
-                        Console.WriteLine("di:  view the Dealer's items");
-                        Console.WriteLine("h:   look at health");
+                        Console.WriteLine("G  = use gun");
+                        Console.WriteLine("VI = view the Dealer's and your items");
+                        Console.WriteLine("UI = use your items");
+                        Console.WriteLine("H  = look at health");
 
                         // Get input
                         input = Console.ReadLine().Trim().ToLower();
@@ -307,7 +307,7 @@ namespace TextShot
                         Console.WriteLine(); // Buffer
 
                         // Process input
-                        if (input == "g")
+                        if (input == "g") // using gun
                         {
                             if (Debug) { Console.WriteLine("Debug Inside Gun loop"); }
                             GunFrom = true;
@@ -346,10 +346,12 @@ namespace TextShot
                             CurrentState = State.PickItem;
                             break;
                         }
-                        else if (input == "di")
+                        else if (input == "vi")
                         {
                             Console.WriteLine("Dealer's items:");
                             d.PrintInventory();
+                            Console.WriteLine("\nYour items:");
+                            p.PrintInventory();
                         }
                         else if (input == "h")
                         {
@@ -369,7 +371,7 @@ namespace TextShot
                         { "Can of Beer",            "CB" },
                         { "Expired Medicine",       "EM" },
                         { "Hand Cuffs",             "HC" },
-                        { "Bugged Circuit Board",   "BC" },
+                        { "B.Circuit Board",   "BC" },
                         { "Infected bullet",        "IB" },
                         { "Magnifying Glass",       "MG" },
                         { "Syringe Shot",           "SS" }
@@ -399,10 +401,10 @@ namespace TextShot
 
                     if (availableOptions.Count == 0)
                     {
-                        Console.WriteLine("- No usable items in inventory.");
+                        Console.WriteLine("- No usable items in inventory");
                     }
 
-                    Console.WriteLine("\nType the acronym of the item to use, or 'c' (cancel) to go back.");
+                    Console.WriteLine("\nType the acronym of the item to use, or 'c' (cancel) to go back");
                     
                     // Get input
                     string input = Console.ReadLine().Trim().ToLower();
@@ -429,7 +431,7 @@ namespace TextShot
                     }
                     else
                     {
-                        Console.WriteLine("\nInvalid input or you don't have that item. Please try again.");
+                        Console.WriteLine("\nInvalid input or you don't have that item. Please try again");
                     }
                 }
 
@@ -475,18 +477,18 @@ namespace TextShot
                                 Console.ReadLine();
                             }
                             // Steal healing item if possible
-                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Syringe Shot"))
+                            else if (d.HasItem("B.Circuit Board") && p.HasItem("Syringe Shot"))
                             {
-                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Bugged Circuit Board to steal Syringe Shot"); }
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using B.Circuit Board to steal Syringe Shot"); }
                                 Program.DealerTargetItem = "Syringe Shot"; 
-                                d.UseItem("Bugged Circuit Board");
+                                d.UseItem("B.Circuit Board");
                                 Console.ReadLine();
                             }
-                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Expired Medicine"))
+                            else if (d.HasItem("B.Circuit Board") && p.HasItem("Expired Medicine"))
                             {
-                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using Bugged Circuit Board to steal Expired Medicine"); }
+                                if (Debug) { Console.WriteLine("Debug Dealer Decide: Using B.Circuit Board to steal Expired Medicine"); }
                                 Program.DealerTargetItem = "Expired Medicine"; 
-                                d.UseItem("Bugged Circuit Board");
+                                d.UseItem("B.Circuit Board");
                                 Console.ReadLine();
                             }
                             else
@@ -511,11 +513,11 @@ namespace TextShot
                             d.UseItem("Hand Cuffs");
                                 Console.ReadLine();
                         }
-                        else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Hand Cuffs"))
+                        else if (d.HasItem("B.Circuit Board") && p.HasItem("Hand Cuffs"))
                         {
                             if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Hand Cuffs"); }
                             Program.DealerTargetItem = "Hand Cuffs";
-                            d.UseItem("Bugged Circuit Board");
+                            d.UseItem("B.Circuit Board");
                             if (d.HasItem("Hand Cuffs")) { d.UseItem("Hand Cuffs"); }
                             Console.ReadLine();
                         }
@@ -535,11 +537,11 @@ namespace TextShot
                                 d.UseItem("Can of Beer");
                                 Console.ReadLine();
                             }
-                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Can of Beer"))
+                            else if (d.HasItem("B.Circuit Board") && p.HasItem("Can of Beer"))
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Can of Beer"); }
                                 Program.DealerTargetItem = "Can of Beer";
-                                d.UseItem("Bugged Circuit Board");
+                                d.UseItem("B.Circuit Board");
                                 if (d.HasItem("Can of Beer")) { d.UseItem("Can of Beer"); }
                                 Console.ReadLine();
                             }
@@ -561,11 +563,11 @@ namespace TextShot
                                 d.UseItem("Magnifying Glass");
                                 Console.ReadLine();
                             }
-                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Magnifying Glass"))
+                            else if (d.HasItem("B.Circuit Board") && p.HasItem("Magnifying Glass"))
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Magnifying Glass"); }
                                 Program.DealerTargetItem = "Magnifying Glass";
-                                d.UseItem("Bugged Circuit Board");
+                                d.UseItem("B.Circuit Board");
                                 if (d.HasItem("Magnifying Glass")) { d.UseItem("Magnifying Glass"); }
                                 Console.ReadLine();
                             }
@@ -592,17 +594,17 @@ namespace TextShot
                                 d.UseItem("Infected bullet");
                                 Console.ReadLine();
                             }
-                            else if (d.HasItem("Bugged Circuit Board") && p.HasItem("Infected bullet"))
+                            else if (d.HasItem("B.Circuit Board") && p.HasItem("Infected bullet"))
                             {
                                 if (Debug) { Console.WriteLine("Debug Dealer Decide: Stealing and using Infected bullet"); }
                                 Program.DealerTargetItem = "Infected bullet";
-                                d.UseItem("Bugged Circuit Board");
+                                d.UseItem("B.Circuit Board");
                                 if (d.HasItem("Infected bullet")) { d.UseItem("Infected bullet"); }
                                 Console.ReadLine();
                             }
                         }
 
-                        Console.WriteLine("\nThe Dealer points the gun at you and pulls the trigger...");
+                        Console.WriteLine("\nThe Dealer points the gun at you and pulls the trigger..");
                         Console.ReadLine();
                         GunTo = true; // True = Shoot Player
                         CurrentState = State.ShootGun;
@@ -610,7 +612,7 @@ namespace TextShot
                     else if (currentBullet == BulletKnowledge.Dud)
                     {
                         if (Debug) { Console.WriteLine("Debug Dealer Decide: Current bullet is KNOWN DUD -> Shoot Self"); }
-                        Console.WriteLine("\nThe Dealer points the gun at themselves and pulls the trigger...");
+                        Console.WriteLine("\nThe Dealer points the gun at themselves and pulls the trigger... ");
                         Console.ReadLine();
                         GunTo = false; // False = Shoot Dealer
                         CurrentState = State.ShootGun;
@@ -623,12 +625,12 @@ namespace TextShot
 
                         if (shootPlayer)
                         {
-                            Console.WriteLine("\nThe Dealer hesitates, then points the gun at you...");
+                            Console.WriteLine("\nThe Dealer hesitates, then points the gun at you... ");
                             GunTo = true;
                         }
                         else
                         {
-                            Console.WriteLine("\nThe Dealer hesitates, then points the gun at themselves...");
+                            Console.WriteLine("\nThe Dealer hesitates, then points the gun at themselves... ");
                             GunTo = false;
                         }
                         Console.ReadLine();
@@ -655,7 +657,7 @@ namespace TextShot
 
                     // Print Bullet
                     if (Debug) { Console.WriteLine($"Debug Current Bullet: {isLive}"); }
-                    if (isLive) { Console.WriteLine("\nBANG\n\nit was a live bullet"); } else { Console.WriteLine("\nCLICK\n\nit was a dud bullet"); }
+                    if (isLive) { Console.WriteLine("\nBANG\n\nit was a live bullet\n"); } else { Console.WriteLine("\nBang\n\nit was a dud bullet\n"); }
 
                     // Remove Health
                     if (isLive)
@@ -690,18 +692,18 @@ namespace TextShot
                     // Turn & Handcuff Logic
                     bool shotSelf = (GunFrom == GunTo);
 
-                    if (!isLive && shotSelf)
+                    if (!isLive && shotSelf) // if dud and shot yourself
                     {
                         // Shot self with a dud -> Keep turn! (Handcuffs stay active until turn actually passes)
-                        Console.WriteLine(GunFrom ? "\nIt was a dud! You get to go again." : "\nIt was a dud! The Dealer goes again.");
+                        Console.WriteLine(GunFrom ? "\nSince it was a dud, you get to go again" : "\nSince it was a dud, the Dealer goes again");
                     }
-                    else
+                    else // if live or shot opponent
                     {
                         // Triggers on: shooting opponent (live/dud) OR shooting self with a live bullet
                         if (HandCuffed)
                         {
                             // Handcuffs skip the opponent's turn, so PlayerTurn stays with the current shooter
-                            Console.WriteLine(GunFrom ? "\nThe Dealer is handcuffed! Their turn is skipped." : "\nYou are handcuffed! Your turn is skipped.");
+                            Console.WriteLine(GunFrom ? "\nThe Dealer is handcuffed! Their turn is skipped" : "\nYou are handcuffed! Your turn is skipped");
                             if (Debug) { Console.WriteLine("Debug Handcuffed used up, skipping opponent's turn"); }
                             HandCuffed = false;
                         }
@@ -711,6 +713,9 @@ namespace TextShot
                             PlayerTurn = !PlayerTurn;
                         }
                     }
+
+                    // Bullets left // i would still prefer 
+                    Console.WriteLine($"\nThere are {Gun.LiveBullets} live bullets and {Gun.DudBullets} dud bullets left");
 
                     CurrentState = State.PreTurnDecisions;
                 }

@@ -42,7 +42,7 @@ namespace TextShot
             {
                 KnownBullets.Add(BulletKnowledge.Unknown);
             }
-            if (Program.Debug) { Console.WriteLine($"Debug Dealer initialized memory: {_knownLive} Live, {_knownDud} Dud."); }
+            if (Program.Debug) { Console.WriteLine($"Debug Dealer initialized memory: {_knownLive} Live, {_knownDud} Dud"); }
             
             DeduceRemainingBullets();
         }
@@ -96,7 +96,7 @@ namespace TextShot
                         KnownBullets[i] = BulletKnowledge.Live;
                     }
                 }
-                if (Program.Debug) { Console.WriteLine("Debug Dealer deduced all remaining bullets are LIVE."); }
+                if (Program.Debug) { Console.WriteLine("Debug Dealer deduced all remaining bullets are LIVE"); }
             }
             // If there are no lives left, every remaining bullet MUST be dud
             else if (_knownLive == 0 && _knownDud > 0)
@@ -108,7 +108,7 @@ namespace TextShot
                         KnownBullets[i] = BulletKnowledge.Dud;
                     }
                 }
-                if (Program.Debug) { Console.WriteLine("Debug Dealer deduced all remaining bullets are DUD."); }
+                if (Program.Debug) { Console.WriteLine("Debug Dealer deduced all remaining bullets are DUD"); }
             }
         }
     }
